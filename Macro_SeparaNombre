@@ -1,0 +1,111 @@
+Sub a()
+
+End Sub
+Sub SepararNombresApellidos()
+    Dim lastRow As Long
+    Dim i As Long
+    Dim fullName As String
+    Dim arrNames() As String
+    Dim firstName As String
+    Dim lastName1 As String
+    Dim lastName2 As String
+    
+    ' Establecer la columna donde se encuentran los nombres completos
+    Const columnaNombres As String = "F"
+    
+    Sheets("Hoja1").Select
+    
+    ' Obtener la última fila con datos en la columna
+    lastRow = Cells(Rows.Count, columnaNombres).End(xlUp).Row
+    
+    ' Recorrer cada fila con nombres completos
+    For i = 2 To lastRow
+            
+        firstName = ""
+        lastName1 = ""
+        lastName2 = ""
+        
+        If Cells(i, "D").Value = "N" Then
+            ' Obtener el nombre completo de la celda actual
+            fullName = Cells(i, columnaNombres).Value
+            fullName = RemoveNumbers(fullName)
+            fullName = Trim(fullName)
+            
+            ' Dividir el nombre completo en partes usando el espacio como delimitador
+            arrNames = Split(fullName, " ")
+            
+            ' Determinar la cantidad de nombres obtenidos
+            Dim numNames As Long
+            numNames = UBound(arrNames) - LBound(arrNames) + 1
+            
+            ' Asignar los nombres y apellidos a variables separadas
+            Select Case numNames
+                Case 1 ' Un nombre y dos apellidos
+                    firstName = ""
+                    lastName1 = arrNames(UBound(arrNames))
+                Case 2 ' Dos nombres y dos apellidos
+                    firstName = arrNames(LBound(arrNames))
+                    lastName1 = arrNames(UBound(arrNames))
+                    lastName2 = ""
+                Case 3 ' Tres nombres y dos apellidos
+                    firstName = arrNames(LBound(arrNames))
+                    lastName1 = arrNames(UBound(arrNames) - 1)
+                    lastName2 = arrNames(UBound(arrNames))
+                Case 4 '  nombres y dos apellidos
+                    
+                    If UCase(arrNames(UBound(arrNames) - 1)) = "DE" Or UCase(arrNames(UBound(arrNames) - 1)) = "DEL" Then
+                    firstName = arrNames(LBound(arrNames))
+                    lastName1 = arrNames(UBound(arrNames) - 2)
+                    lastName2 = arrNames(UBound(arrNames) - 1) + " " + arrNames(UBound(arrNames))
+                    Else
+                    firstName = arrNames(LBound(arrNames)) + " " + arrNames(LBound(arrNames) + 1)
+                    lastName1 = arrNames(UBound(arrNames) - 1)
+                    lastName2 = arrNames(UBound(arrNames))
+                    End If
+                    
+                Case 5 '  nombres y dos apellidos
+                    
+                    If UCase(arrNames(UBound(arrNames) - 1)) = "DE" Or UCase(arrNames(UBound(arrNames) - 1)) = "DEL" Then
+                    firstName = arrNames(LBound(arrNames)) + " " + arrNames(LBound(arrNames) + 1)
+                    lastName1 = arrNames(UBound(arrNames) - 2)
+                    lastName2 = arrNames(UBound(arrNames) - 1) + " " + arrNames(UBound(arrNames))
+                    Else
+                    firstName = arrNames(LBound(arrNames)) + " " + arrNames(LBound(arrNames) + 1) + " " + arrNames(LBound(arrNames) + 2)
+                    lastName1 = arrNames(UBound(arrNames) - 1)
+                    lastName2 = arrNames(UBound(arrNames))
+                    End If
+                    
+                Case 6
+                    If UCase(arrNames(UBound(arrNames) - 1)) = "DE" Or UCase(arrNames(UBound(arrNames) - 1)) = "DEL" Then
+                    firstName = arrNames(LBound(arrNames)) + " " + arrNames(LBound(arrNames) + 1) + " " + arrNames(LBound(arrNames) + 2)
+                    lastName1 = arrNames(UBound(arrNames) - 2)
+                    lastName2 = arrNames(UBound(arrNames) - 1) + " " + arrNames(UBound(arrNames))
+                    Else
+                    
+                    firstName = arrNames(LBound(arrNames)) + " " + arrNames(LBound(arrNames) + 1) + " " + arrNames(LBound(arrNames) + 2) + " " + arrNames(LBound(arrNames) + 3)
+                    lastName1 = arrNames(UBound(arrNames) - 1)
+                    lastName2 = arrNames(UBound(arrNames))
+                    End If
+                Case Else ' Cualquier otro caso se considera un formato inválido
+                    firstName = ""
+                    lastName1 = ""
+                    lastName2 = ""
+            End Select
+        End If
+        ' Escribir los nombres y apellidos en columnas separadas (B, C, D en este ejemplo)
+        Cells(i, "G").Value = firstName
+        Cells(i, "H").Value = lastName1
+        Cells(i, "I").Value = lastName2
+    Next i
+End Sub
+
+Function RemoveNumbers(Txt As String) As String
+With CreateObject("VBScript.RegExp")
+.Global = True
+.Pattern = "[0-9]"
+RemoveNumbers = .Replace(Txt, "")
+End With
+End Function
+
+
+
